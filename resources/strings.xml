@@ -1,0 +1,4 @@
+<resources>
+    <string id="AppName">TapBPM</string>
+    <string id="DeviceId">main</string>
+</resources>
