@@ -2,6 +2,7 @@ using Toybox.Application as App;
 using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 using Toybox.Application.Storage as Stor;
+using Toybox.Math as Math;
 
 var g_bpmCalculator = null;
 var g_bpmHistory = null;
@@ -56,7 +57,7 @@ class BPMView extends Ui.View
         dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
     
         var consistency = g_bpmCalculator.getConsistencyInfo();
-        if (g_bpmCalculator.getBPM() > 0) {
+        if (consistency[0] > 0) {
             // -- display elapsed time
             // convert secs to mins and secs
             var min = 0;
@@ -70,26 +71,28 @@ class BPMView extends Ui.View
             dc.drawText( (dc.getWidth() / 2) - posShift, Gfx.getFontHeight(Gfx.FONT_MEDIUM), Gfx.FONT_MEDIUM, timerString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
             
             // -- display confidence info
+            var validThreshold = g_bpmCalculator.getValidThreshold();
+            
             // configure confidence colors
             if (m_isMono == true) {
                 dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
             } else if (consistency[1] < 3) {
                 dc.setColor( Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT );
-            } else if (consistency[1] >= 3 && consistency[1] < 5) {
+            } else if (consistency[1] >= 3 && consistency[1] < validThreshold) {
                 dc.setColor( Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT );
             } else {
                 dc.setColor( Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT );
             }
             // build confidence string
-            var bpmConfidenceString = "";
-            for (var i = 0; i < 5; i++) {
+            var bpmConfidenceString = "|";
+            for (var i = 0; i < validThreshold; i++) {
                 if (i < consistency[1]) {
                     bpmConfidenceString = bpmConfidenceString + "|";
                 } else {
                     bpmConfidenceString = bpmConfidenceString + "-";
                 }
             }
-            if (consistency[1] >= 5) {
+            if (consistency[1] >= validThreshold) {
                 bpmConfidenceString = bpmConfidenceString + " VALID";
             }
             // draw confidence string
@@ -98,7 +101,11 @@ class BPMView extends Ui.View
             // -- display BPM
             // format and draw BPM
             dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
-            var bpmString = "" + g_bpmCalculator.getBPM().format("%.1f");
+            var bpm = g_bpmCalculator.getBPM();
+            var bpmString = "---";
+            if (bpm > 0) {
+               bpmString = "" + bpm.format("%.1f");
+            }
             dc.drawText( (dc.getWidth() / 2), (dc.getHeight() / 2), Gfx.FONT_NUMBER_THAI_HOT, bpmString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
             
             // -- display irregular warning

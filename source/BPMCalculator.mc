@@ -7,6 +7,7 @@ class BPMCalculator {
     hidden var m_startTime;
     hidden var m_numSamples;
     hidden var m_bpm;
+    hidden var m_validThreshold;
     hidden var m_secsElapsed;
     
     hidden var PERCENT_CONSISTENT = 13;  // 13% maximum deviation
@@ -18,6 +19,7 @@ class BPMCalculator {
         m_startTime = 0;
         m_numSamples = 0;
         m_bpm = 0.0;
+        m_validThreshold = 5;
         m_secsElapsed = 0;
     }
 
@@ -48,7 +50,7 @@ class BPMCalculator {
         m_numSamples += 1;
         
         // Calculate BPM using median method if we have enough intervals
-        if (m_intervals.size() >= 2) {
+        if (m_intervals.size() >= 1) {
             var medianInterval = calculateMedian(m_intervals);
             var consistentIntervals = filterConsistentIntervals(m_intervals, medianInterval);
             
@@ -61,6 +63,7 @@ class BPMCalculator {
             
             // Convert to BPM (beats per minute)
             m_bpm = 60000.0 / finalMedianInterval;
+            m_validThreshold = calculateValidThreshold(m_bpm);
         }
         
         return true;
@@ -119,9 +122,27 @@ class BPMCalculator {
         
         return consistentIntervals;
     }
+    
+    function calculateValidThreshold(bpm) {
+        // calculate validity threshold, add 1 more tap for each 10 bpm over 30
+        var validThreshold = Math.floor((bpm - 30) / 10.0);
+        // bound dynamic range between 0 and 5
+        if (validThreshold < 0) {
+            validThreshold = 0;
+        } else if (validThreshold > 5) {
+            validThreshold = 5;
+        }
+        // add constant threshold
+        validThreshold = validThreshold + 5;
+        return validThreshold;
+    }
 
     function getBPM() {
         return m_bpm;
+    }
+    
+    function getValidThreshold() {
+        return m_validThreshold;
     }
 
     function getNumSamples() {
@@ -158,6 +179,7 @@ class BPMCalculator {
         m_startTime = 0;
         m_numSamples = 0;
         m_bpm = 0.0;
+        m_validThreshold = 5;
         m_secsElapsed = 0;
     }
 }
