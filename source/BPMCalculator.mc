@@ -1,4 +1,5 @@
 using Toybox.System;
+using Toybox.Math as Math;
 
 class BPMCalculator {
     // Static-like variables for the calculator
@@ -10,8 +11,9 @@ class BPMCalculator {
     hidden var m_validThreshold;
     hidden var m_secsElapsed;
     
-    hidden var PERCENT_CONSISTENT = 13;  // 13% maximum deviation
-    hidden var MAX_SAMPLES = 30;         // Limit stored samples
+    hidden var PERCENT_CONSISTENT = 13;     // Maximum deviation (%)
+    hidden var MIN_VALIDITY_INTERVALS = 4;  // Minimum intervals to go valid
+    hidden var MAX_SAMPLES = 30;            // Limit stored samples
 
     function initialize() {
         m_tapTimes = [];
@@ -19,7 +21,7 @@ class BPMCalculator {
         m_startTime = 0;
         m_numSamples = 0;
         m_bpm = 0.0;
-        m_validThreshold = 5;
+        m_validThreshold = MIN_VALIDITY_INTERVALS;
         m_secsElapsed = 0;
     }
 
@@ -133,7 +135,7 @@ class BPMCalculator {
             validThreshold = 5;
         }
         // add constant threshold
-        validThreshold = validThreshold + 5;
+        validThreshold = validThreshold + MIN_VALIDITY_INTERVALS;
         return validThreshold;
     }
 
@@ -179,7 +181,7 @@ class BPMCalculator {
         m_startTime = 0;
         m_numSamples = 0;
         m_bpm = 0.0;
-        m_validThreshold = 5;
+        m_validThreshold = MIN_VALIDITY_INTERVALS;
         m_secsElapsed = 0;
     }
 }

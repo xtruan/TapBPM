@@ -72,13 +72,14 @@ class BPMView extends Ui.View
             
             // -- display confidence info
             var validThreshold = g_bpmCalculator.getValidThreshold();
+            var yellowThreshold = Math.floor(validThreshold / 2.0);
             
             // configure confidence colors
             if (m_isMono == true) {
                 dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
-            } else if (consistency[1] < 3) {
+            } else if (consistency[1] < yellowThreshold) {
                 dc.setColor( Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT );
-            } else if (consistency[1] >= 3 && consistency[1] < validThreshold) {
+            } else if (consistency[1] >= yellowThreshold && consistency[1] < validThreshold) {
                 dc.setColor( Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT );
             } else {
                 dc.setColor( Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT );
