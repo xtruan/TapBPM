@@ -76,6 +76,11 @@ class BPMView extends Ui.View
         dc.setColor( Gfx.COLOR_TRANSPARENT, Gfx.COLOR_BLACK );
         dc.clear();
         dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
+        
+        // draw dots to advertise menu
+        dc.fillCircle((2* uiP), uiY + (4 * uiP), uiP);
+        dc.fillCircle((2* uiP), uiY, uiP);
+        dc.fillCircle((2* uiP), uiY - (4 * uiP), uiP);
     
         var consistency = g_bpmCalculator.getConsistencyInfo();
         if (consistency[0] > 0) {
@@ -130,10 +135,11 @@ class BPMView extends Ui.View
             var uiBarFill = uiS * valid;
             var uiBarH = (uiH / 2) + uiP;
             
+            // if valid, draw check mark
             if (valid == validThreshold) {
-                // shift X to account for check
+                // shift X position to account for check
                 uiBarX = uiBarX - (uiBarH / 2);
-                // draw valid check
+                // draw check
                 dc.setPenWidth(uiP * 1.5);
                 dc.drawLine(uiBarX + uiBarMax + (uiP * 2), 
                             uiBarY + (uiBarH / 2) - uiP, 
@@ -147,8 +153,10 @@ class BPMView extends Ui.View
             
             // draw confidence bar
             dc.setPenWidth(uiP);
-            dc.drawRectangle(uiBarX, uiBarY, uiBarMax, uiBarH);
-            dc.fillRectangle(uiBarX, uiBarY, uiBarFill, uiBarH);
+            //dc.drawRectangle(uiBarX, uiBarY, uiBarMax, uiBarH);
+            //dc.fillRectangle(uiBarX, uiBarY, uiBarFill, uiBarH);
+            dc.drawRoundedRectangle(uiBarX, uiBarY, uiBarMax, uiBarH, uiR);
+            dc.fillRoundedRectangle(uiBarX, uiBarY, uiBarFill, uiBarH, uiR);
             //Sys.println("draw: " + [uiBarX, uiBarY, uiBarMax, uiBarH]);
             //Sys.println("fill: " + [uiBarX, uiBarY, uiBarFill, uiBarH]);
              
