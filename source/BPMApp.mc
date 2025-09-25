@@ -153,10 +153,10 @@ class BPMView extends Ui.View
             
             // draw confidence bar
             dc.setPenWidth(uiP);
-            //dc.drawRectangle(uiBarX, uiBarY, uiBarMax, uiBarH);
-            //dc.fillRectangle(uiBarX, uiBarY, uiBarFill, uiBarH);
-            dc.drawRoundedRectangle(uiBarX, uiBarY, uiBarMax, uiBarH, uiR);
-            dc.fillRoundedRectangle(uiBarX, uiBarY, uiBarFill, uiBarH, uiR);
+            dc.drawRectangle(uiBarX, uiBarY, uiBarMax, uiBarH);
+            dc.fillRectangle(uiBarX, uiBarY, uiBarFill, uiBarH);
+            //dc.drawRoundedRectangle(uiBarX, uiBarY, uiBarMax, uiBarH, uiR);
+            //dc.fillRoundedRectangle(uiBarX, uiBarY, uiBarFill, uiBarH, uiR);
             //Sys.println("draw: " + [uiBarX, uiBarY, uiBarMax, uiBarH]);
             //Sys.println("fill: " + [uiBarX, uiBarY, uiBarFill, uiBarH]);
              
