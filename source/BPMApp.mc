@@ -52,15 +52,25 @@ class BPMView extends Ui.View
             posShift = 30;
         }
         
-        var x = dc.getWidth() / 2;
-        var y = dc.getHeight() / 2;
-        var h = Gfx.getFontHeight(Gfx.FONT_MEDIUM);
-        var r = x;
-        if (x >= y) {
-            r = y;
+        // -- configure ui scaling variables
+        // half display width
+        var uiX = dc.getWidth() / 2;
+        // half display height
+        var uiY = dc.getHeight() / 2;
+        // medium font height
+        var uiH = Gfx.getFontHeight(Gfx.FONT_MEDIUM);
+        // smaller of uiX or uiY
+        var uiR = uiX;
+        if (uiX >= uiY) {
+            uiR = uiY;
         }
-        var s = r / 7;
-        var p = 2;
+        // scale factor
+        var uiS = uiR / 7;
+        if (m_isMono == true) {
+            uiS = uiR / 10;
+        }
+        // pen width
+        var uiP = 2;
             
         // clear display
         dc.setColor( Gfx.COLOR_TRANSPARENT, Gfx.COLOR_BLACK );
@@ -79,7 +89,7 @@ class BPMView extends Ui.View
             }
             // format and draw time
             var timerString = "" + min.format("%d") + ":" + sec.format("%02d");
-            dc.drawText( x - posShift, h, Gfx.FONT_MEDIUM, timerString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
+            dc.drawText( uiX - posShift, uiH, Gfx.FONT_MEDIUM, timerString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
             
             // -- display confidence info
             var validThreshold = g_bpmCalculator.getValidThreshold();
@@ -113,19 +123,35 @@ class BPMView extends Ui.View
                 valid = validThreshold;
             }
             
-            dc.setPenWidth(p);
-            dc.drawRectangle(x - (s * validThreshold / 2) - posShift, (2.0 * h) - (h / 2) + p, s * validThreshold, (h / 2) + p);
-            //Sys.println("draw: " + [x - (s * validThreshold / 2) - posShift, (2.0 * h) - (h / 2), s * validThreshold, (h / 2) + p]);
-            dc.fillRectangle(x - (s * valid / 2) - posShift, (2.0 * h) - (h / 2) + p, s * valid, (h / 2) + p);
-            //Sys.println("fill: " + [x - (s * valid / 2) - posShift, (2.0 * h) - (h / 2), s * valid, (h / 2) + p]);
+            // calculate confidence bar position and size
+            var uiBarX = uiX - (uiS * validThreshold / 2) - posShift;
+            var uiBarY = (2.0 * uiH) - (uiH / 2) + uiP;
+            var uiBarMax = uiS * validThreshold;
+            var uiBarFill = uiS * valid;
+            var uiBarH = (uiH / 2) + uiP;
             
-            //var bpmConfidenceString = "";
-            //if (valid == validThreshold) {
-            //    dc.setColor( Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT );
-            //    bpmConfidenceString = bpmConfidenceString + "VALID";
-            //}
-            //dc.drawText( x - posShift, (1.9 * h) - (h / 2), Gfx.FONT_TINY, bpmConfidenceString, Gfx.TEXT_JUSTIFY_CENTER );
+            if (valid == validThreshold) {
+                // shift X to account for check
+                uiBarX = uiBarX - (uiBarH / 2);
+                // draw valid check
+                dc.setPenWidth(uiP * 1.5);
+                dc.drawLine(uiBarX + uiBarMax + (uiP * 2), 
+                            uiBarY + (uiBarH / 2) - uiP, 
+                            uiBarX + uiBarMax + (uiBarH / 2), 
+                            uiBarY + uiBarH - uiP);
+                dc.drawLine(uiBarX + uiBarMax + (uiBarH / 2), 
+                            uiBarY + uiBarH - uiP, 
+                            uiBarX + uiBarMax + uiBarH, 
+                            uiBarY);
+            }
             
+            // draw confidence bar
+            dc.setPenWidth(uiP);
+            dc.drawRectangle(uiBarX, uiBarY, uiBarMax, uiBarH);
+            dc.fillRectangle(uiBarX, uiBarY, uiBarFill, uiBarH);
+            //Sys.println("draw: " + [uiBarX, uiBarY, uiBarMax, uiBarH]);
+            //Sys.println("fill: " + [uiBarX, uiBarY, uiBarFill, uiBarH]);
+             
             // -- display BPM
             // format and draw BPM
             dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
@@ -134,29 +160,36 @@ class BPMView extends Ui.View
             if (bpm > 0) {
                bpmString = "" + bpm.format("%.1f");
             }
-            dc.drawText( x, y, Gfx.FONT_NUMBER_THAI_HOT, bpmString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
+            dc.drawText( uiX, uiY, Gfx.FONT_NUMBER_THAI_HOT, bpmString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
             
-            // -- display irregular warning
+            // -- display irregular warning or validity
             if (consistency[3] == true) {
                 // format and draw irregular warning
                 dc.setColor( Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT );
                 var bpmIrregularString = "IRREGULAR";
-                dc.drawText( x, (y * 2) - (1.9 * h) + (2 * p), Gfx.FONT_SMALL, bpmIrregularString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
+                dc.drawText( uiX, (uiY * 2) - (1.9 * uiH) + (2 * uiP), Gfx.FONT_SMALL, bpmIrregularString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
                 dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
-            }
+            } 
+            //else if (valid == validThreshold) {
+            //    // if not irregular, and valid, display valid
+            //    dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
+            //    var bpmValidString = "VALID";
+            //    dc.drawText( uiX, (uiY * 2) - (1.9 * uiH) + (2 * uiP), Gfx.FONT_SMALL, bpmValidString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
+            //    dc.setColor( Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT );
+            //}
             
             
         } else {
             // -- display startup info
             var tapMsg = "Tap for rate/min";
-            dc.drawText( x, y - h, Gfx.FONT_MEDIUM, tapMsg, Gfx.TEXT_JUSTIFY_CENTER );
+            dc.drawText( uiX, uiY - uiH, Gfx.FONT_MEDIUM, tapMsg, Gfx.TEXT_JUSTIFY_CENTER );
             var holdMsg = "Hold to reset";
-            dc.drawText( x, y, Gfx.FONT_MEDIUM, holdMsg, Gfx.TEXT_JUSTIFY_CENTER );
+            dc.drawText( uiX, uiY, Gfx.FONT_MEDIUM, holdMsg, Gfx.TEXT_JUSTIFY_CENTER );
         }
         
         // -- display num samples
         // format and draw num samples
         var numSamplesString = "" + consistency[0].format("%d") + " taps";
-        dc.drawText( x, (y * 2) - h, Gfx.FONT_MEDIUM, numSamplesString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
+        dc.drawText( uiX, (uiY * 2) - uiH, Gfx.FONT_MEDIUM, numSamplesString, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER );
     }
 }
