@@ -1,5 +1,6 @@
 using Toybox.System;
 using Toybox.Math as Math;
+using Toybox.System as Sys;
 
 class BPMCalculator {
     // Static-like variables for the calculator
@@ -14,6 +15,7 @@ class BPMCalculator {
     hidden var PERCENT_CONSISTENT = 13;     // Maximum deviation (%)
     hidden var MIN_VALIDITY_INTERVALS = 4;  // Minimum intervals to go valid
     hidden var MAX_SAMPLES = 30;            // Limit stored samples
+    hidden var SORTER = new QuickSort();
 
     function initialize() {
         m_tapTimes = [];
@@ -82,16 +84,9 @@ class BPMCalculator {
             sorted.add(values[i]);
         }
         
-        // Simple bubble sort (MonkeyC doesn't have built-in sort)
-        for (var i = 0; i < sorted.size() - 1; i++) {
-            for (var j = 0; j < sorted.size() - i - 1; j++) {
-                if (sorted[j] > sorted[j + 1]) {
-                    var temp = sorted[j];
-                    sorted[j] = sorted[j + 1];
-                    sorted[j + 1] = temp;
-                }
-            }
-        }
+        //Sys.println("" + sorted);
+        SORTER.sort(sorted);
+        //Sys.println("" + sorted);
         
         var mid = sorted.size() / 2;
         
