@@ -1,7 +1,5 @@
 # TapBPM
-TapBPM app for Garmin ConnectIQ
-
-TapBPM - Respiratory Rate Calculator
+TapBPM - Respiratory Rate Calculator app for Garmin ConnectIQ
 
 This app calculates respiratory rate by tapping along with each breath. Tap once per breath cycle, and the calculator determines breaths per minute using a median-based method that filters out inconsistent taps. The app requires a minimum number of consistent intervals before providing a valid reading, with the threshold automatically adjusting based on breathing rate. Useful for tracking respiratory patterns during exercise, relaxation practices, or general health monitoring.
 
